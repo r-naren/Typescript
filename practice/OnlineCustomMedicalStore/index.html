@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Medical Store</title>
+
+    <link rel="stylesheet" href="./css/medicalStore.css">
+
+</head>
+
+<body>
+
+    <div id="homePage">
+        <h2>Online Medical store</h2>
+        <br>
+        <button type="button" onclick="newUserPage()">Sign Up</button>
+        <button type="button" onclick="existingUserPage()">Sign In</button>
+
+
+    </div>
+
+    <div id="newUserPage">
+
+        <h2>Sign Up Page</h2>
+        <br>
+        <label> Email : </label><br><input type="email" id="newEmail" onkeyup="checkNewEmail('newEmail')"><label
+            id="newEmailMessage"></label><br>
+        <label> Password : </label><br><input type="password" id="newUserPassword" onkeyup="checkNewUserPassword('newUserPassword')"><label
+            id="newUserPasswordMessage"></label><br>
+        <label> Confirm Password : </label><br><input type="password" id="newUserConfirmPassword" onkeyup="checkNewUserConfirmPassword('newUserConfirmPassword', 'newUserPassword')"><label
+            id="newUserConfirmPasswordMessage"></label><br>
+        
+        <label> Phone Number : </label><br><input type="tel" id="newUserPhoneNumber"
+            onkeyup="checkNewUserPhoneNumber('newUserPhoneNumber')"><label id="newUserPhoneNumberMessage"></label><br>
+
+        <button onclick="signUp()">Sign Up</button>
+    </div>
+
+    <div id="existingUserPage">
+
+        <h3>Sign In Page</h3>
+        <label> Email : </label><br><input type="email" id="existingEmail" onkeyup="checkEmail('existingEmail')"><label
+            id="existingEmailMessage"></label><br>
+        <label> Password : </label><br><input type="password" id="existingPassword" onkeyup="checkNewUserPassword('existingPassword')"><label
+            id="existingPasswordMessage"></label><br>
+        
+        <br>
+        <button type="button" onclick="signIn()">Sign In</button><br>
+        <label id="availableUser"></label>
+
+    </div>
+
+    <div id="medicinePage">
+
+        
+        
+        <div id = "menu">
+            <h2>Medical Store</h2>
+            <button onclick="displayHomePage()">Go Login Page</button><br>
+            <ul>
+                <li><button onclick="medicinePage()">Home</button><br></li>
+                <li><button onclick="showMedicineDetails()">Show medicine Details</button><br></li>
+                <li><button onclick="purchaseMedicine()">Purchase medicine</button><br></li>
+                <li><button onclick="cancelOrder()">Cancel Medicine</button><br></li>
+                <li><button onclick="topUp()">TopUp</button><br></li>
+                <li><button onclick="showBalance()">Show Balance</button><br></li>
+                <li><button onclick="showOrderHistory()">Show Order History</button><br></li>
+
+            </ul>
+        </div>
+        
+        <label id="greet"></label>
+        <div id="medicineDetailsTable">
+             
+        </div>
+        <div id="purchaseMedicineTable">
+            
+            <!-- <h3>Want to Buy a Medicine?</h3>
+            <select name="medicineList" id="medicineList" onchange="medicineListCheck()">
+
+                <option value="Paracetomol">Paracetomol</option>
+                <option value="Colpal">Colpal</option>
+                <option value="Stepsil">Stepsil</option>
+                <option value="Iodex">Iodex</option>
+                <option value="Acetherol">Acetherol</option>
+            </select>
+
+            <button onclick="medicineListCheck()">Check</button><br> -->
+        </div>
+        <div id="cancelOrderTable"></div>
+        <div id="recharge">
+            
+        </div>
+        <div id="showBalance">
+            <h2>Balance</h2>
+        </div>
+        <div id="showOrderHistoryTable">
+            <h2>Orders</h2>
+        </div>
+        <br>
+        
+        <br>
+        <!-- <label id="medicineInfo"></label>
+
+        <br><br>
+        <div id="requiredCount">
+            <label>Required Count </label><input type="number" id="medicineRequiredCount"><button
+                onclick="buyMedicine()">Buy</button>
+
+        </div> -->
+
+    </div>
+</body>
+
+<script type="text/JavaScript" src="./javascript/medicalStore.js"></script>
+
+</html>
