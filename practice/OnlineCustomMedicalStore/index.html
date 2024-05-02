@@ -19,11 +19,10 @@
         <button type="button" onclick="newUserPage()">Sign Up</button>
         <button type="button" onclick="existingUserPage()">Sign In</button>
 
-
     </div>
 
     <div id="newUserPage">
-
+        
         <h2>Sign Up Page</h2>
         <br>
         <label> Email : </label><br><input type="email" id="newEmail" onkeyup="checkNewEmail('newEmail')"><label
@@ -40,8 +39,8 @@
     </div>
 
     <div id="existingUserPage">
-
-        <h3>Sign In Page</h3>
+        
+        <h2>Sign In Page</h2>
         <label> Email : </label><br><input type="email" id="existingEmail" onkeyup="checkEmail('existingEmail')"><label
             id="existingEmailMessage"></label><br>
         <label> Password : </label><br><input type="password" id="existingPassword" onkeyup="checkNewUserPassword('existingPassword')"><label
@@ -55,16 +54,14 @@
 
     <div id="medicinePage">
 
-        
-        
         <div id = "menu">
             <h2>Medical Store</h2>
-            <button onclick="displayHomePage()">Go Login Page</button><br>
+            <button onclick="displayHomePage()">Go to Login Page</button><br>
             <ul>
                 <li><button onclick="medicinePage()">Home</button><br></li>
                 <li><button onclick="showMedicineDetails()">Show medicine Details</button><br></li>
                 <li><button onclick="purchaseMedicine()">Purchase medicine</button><br></li>
-                <li><button onclick="cancelOrder()">Cancel Medicine</button><br></li>
+                <li><button onclick="cancelOrder()">Cancel Order</button><br></li>
                 <li><button onclick="topUp()">TopUp</button><br></li>
                 <li><button onclick="showBalance()">Show Balance</button><br></li>
                 <li><button onclick="showOrderHistory()">Show Order History</button><br></li>
@@ -72,33 +69,57 @@
             </ul>
         </div>
         
-        <label id="greet"></label>
-        <div id="medicineDetailsTable">
-             
+        <div id="greet"></div>
+        <div id="medicineDetailsPage">
+            <button id="showMedicineForm" onclick="showMedicineForm()">To Add Medicine</button>
+            <div id="medicineForm">
+                <table border="1rem solid white">
+                    <tr>
+                        <form id="addMedicineForm">
+                            <td><label> Medicine Name : </label><input type="text" id="medicineName" required></td>
+                            <td><label> Quantity : </label><input type="number" min="1" id="medicineQuantity" required></td>
+                            <td><label> Price : </label><input type="number" min="1" id="medicinePrice" required></td>
+                            <td><label> Expiry Date : </label><input type="date" id="medicineExpiryDate" required ></td>
+                            <td><button type="submit" id="submitButton">Add Medicine</button> </td>
+                        </form>
+                    </tr>
+                </table>
+            
+             </div>
+             <div id="medicineFormEdit">
+                <table border="1rem solid white">
+                    <tr>
+                        <form id="editMedicineForm">
+                            <td><label> Medicine Name : </label><input type="text" id="editMedicineName" disabled></td>
+                            <td><label> Quantity : </label><input type="number" min="1" id="editMedicineQuantity" required></td>
+                            <td><label> Price : </label><input type="number" min="1" id="editMedicinePrice" disabled></td>
+                            <td><label> Expiry Date : </label><input type="date" id="editMedicineExpiryDate" disabled ></td>
+                            <td><button type="submit" id="editMedicine">Edit Medicine</button> </td>
+                        </form>
+                    </tr>
+                </table>
+            
+            </div>
+             <div id="medicineDetailsTable">
+
+             </div>
         </div>
         <div id="purchaseMedicineTable">
             
-            <!-- <h3>Want to Buy a Medicine?</h3>
-            <select name="medicineList" id="medicineList" onchange="medicineListCheck()">
-
-                <option value="Paracetomol">Paracetomol</option>
-                <option value="Colpal">Colpal</option>
-                <option value="Stepsil">Stepsil</option>
-                <option value="Iodex">Iodex</option>
-                <option value="Acetherol">Acetherol</option>
-            </select>
-
-            <button onclick="medicineListCheck()">Check</button><br> -->
         </div>
-        <div id="cancelOrderTable"></div>
+        <div id="cancelOrderTable">
+
+        </div>
         <div id="recharge">
-            
+            <h2>Recharge</h2>
+            <h3>Input money to recharge : <input type="number" min="1" id="addMoney" > 
+            <input type="button" value="Add" onclick="addMoney()"></h3>
         </div>
         <div id="showBalance">
-            <h2>Balance</h2>
+           
         </div>
         <div id="showOrderHistoryTable">
-            <h2>Orders</h2>
+            
         </div>
         <br>
         

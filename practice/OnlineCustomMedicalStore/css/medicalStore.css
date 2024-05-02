@@ -12,26 +12,10 @@ body{
     display:  block;
 }
 
-
-#newUserPage{
-    display: none;
-}
-#existingUserPage{
+#medicinePage, #medicineForm, #medicineFormEdit, #existingUserPage, #newUserPage, #medicineDetailsPage, #recharge{
     display: none;
 }
 
-#medicinePage{
-    display: none;
-}
-
-#requiredCount
-{
-    display: none;
-}
-
-#historyDisplay{
-    display: none;
-}
 
 button{
     width: 10rem;
@@ -53,8 +37,7 @@ input{
     display: flex;
 }
 th, td{
-    border-style: solid;
+    border-style: none;
     border-collapse: collapse;
-    border-color: rgb(255, 0, 0);
     padding: 1rem;
 }

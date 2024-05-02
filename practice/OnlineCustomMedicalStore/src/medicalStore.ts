@@ -53,7 +53,7 @@ class MedicineInfo {
 
 }
 
-enum OrderStatus{ Initiated, Ordered, Cancelled}
+enum OrderStatus{  Ordered ="Ordered", Cancelled = "Cancelled"}
 
 class Order {
     OrderId: string;
@@ -96,11 +96,13 @@ let OrderList: Array<Order> = new Array<Order>();
 
 
 function newUserPage() {
-    let homePage = document.getElementById('homePage') as HTMLDivElement;
+    hideAllHome();
     let newUserPage = document.getElementById('newUserPage') as HTMLDivElement;
-
-    homePage.style.display = "none";
+    let existingUserPage = document.getElementById('existingUserPage') as HTMLDivElement;
+    let homePage = document.getElementById('homePage') as HTMLDivElement;
+    homePage.style.display = "block";
     newUserPage.style.display = "block";
+    existingUserPage.style.display ="none";
 }
 
 function signUp() {
@@ -230,7 +232,7 @@ function checkNewUserConfirmPassword(paramNewUserConfirmPassword: string, paramN
 function checkNewUserPhoneNumber(paramNewUserPhoneNumber: string) {
     let newUserPhoneNumber = (document.getElementById(paramNewUserPhoneNumber) as HTMLInputElement).value;
     let newUserPhoneNumberMessage = document.getElementById(paramNewUserPhoneNumber + "Message") as HTMLLabelElement;
-    let newUserPhoneNumberRegex = /^[7-9][0-9]{9}$/;
+    let newUserPhoneNumberRegex = /^[7-9]{1}[0-9]{9}$/;
 
     if (newUserPhoneNumberRegex.test(newUserPhoneNumber)) {
 
@@ -241,28 +243,18 @@ function checkNewUserPhoneNumber(paramNewUserPhoneNumber: string) {
         NewUserPhoneNumberStatus = false;
         newUserPhoneNumberMessage.innerHTML = "Please enter valid phone number";
         newUserPhoneNumberMessage.style.visibility = "visible";
-        newUserPhoneNumberMessage.style.color = "tomato";
-        newUserPhoneNumberMessage.style.marginLeft = "10px";
+        newUserPhoneNumberMessage.style.color = "red";
+        newUserPhoneNumberMessage.style.marginLeft = "0.6rem";
     }
 
 }
 
 function existingUserPage() {
-    let homePage = document.getElementById('homePage') as HTMLDivElement;
+    let newUserPage = document.getElementById('newUserPage') as HTMLDivElement;
     let existingUserPage = document.getElementById('existingUserPage') as HTMLDivElement;
-    let availableUser = document.getElementById('availableUser') as HTMLLabelElement;
 
-    homePage.style.display = "none";
+    newUserPage.style.display = "none";
     existingUserPage.style.display = "block";
-
-    // availableUser.innerHTML = "<h2>Available User</h2>";
-
-
-    // for (let i = 0; i < UserArrayList.length; i++) {
-
-    //     availableUser.innerHTML += `User Email : ${UserArrayList[i].Email} | User Id : ${UserArrayList[i].UserId}<br>`;
-    // }
-
 }
 
 function signIn() {
@@ -300,194 +292,241 @@ function signIn() {
 
 function medicinePage() {
 
-    let existingUserPage = document.getElementById('existingUserPage') as HTMLDivElement;
+    hideAllHome();
     let medicinePage = document.getElementById('medicinePage') as HTMLDivElement;
     
-    let medicineDetailsTable = document.getElementById('medicineDetailsTable') as HTMLDivElement;
     let menu = document.getElementById('menu') as HTMLDivElement;
     let greet = document.getElementById('greet') as HTMLLabelElement;
-    medicineDetailsTable.style.display = "none";
-    existingUserPage.style.display = "none";
+    
+    
     medicinePage.style.display = "block";
     menu.style.display= "block";
+    greet.style.display = "block";
     greet.innerHTML = `<h3>Hello ${CurrentUser.Email}</h3>`;
 }
 
-function medicineListCheck() {
-    let medicineInfo = document.getElementById('medicineInfo') as HTMLLabelElement;
 
-    let medicineList = document.getElementById('medicineList') as HTMLSelectElement;
+const form = document.getElementById("addMedicineForm") as HTMLFormElement;
+const medicineName = document.getElementById('medicineName') as HTMLInputElement;
+const medicineQuantity = document.getElementById('medicineQuantity') as HTMLInputElement;
+const medicinePrice = document.getElementById('medicinePrice') as HTMLInputElement;
+const medicineExpiryDate= document.getElementById('medicineExpiryDate') as HTMLInputElement;
+const editMedicineName = document.getElementById('editMedicineName') as HTMLInputElement;
+let editMedicineQuantity = document.getElementById('editMedicineQuantity') as HTMLInputElement;
+const editMedicinePrice = document.getElementById('editMedicinePrice') as HTMLInputElement;
+const editMedicineExpiryDate= document.getElementById('editMedicineExpiryDate') as HTMLInputElement;
+form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    MedicineList.push(new MedicineInfo(medicineName.value,  parseInt(medicineQuantity.value), parseFloat(medicinePrice.value),  new Date(medicineExpiryDate.value)));
+    showMedicineDetails();
+    form.reset();
+    let medicineForm = document.getElementById('medicineForm') as HTMLDivElement;
+    medicineForm.style.display = "none";
+  });
 
-    let medicineName = medicineList[medicineList.selectedIndex].innerHTML;
-
-    for (let i = 0; i < MedicineList.length; i++) {
-
-        if (MedicineList[i].MedicineName == medicineName) {
-            medicineInfo.innerHTML = `Medicine Id : ${MedicineList[i].MedicineId} --- Medicine Name : ${MedicineList[i].MedicineName} --- Medicine Count : ${MedicineList[i].MedicineCount} --- Medicine Price : ${MedicineList[i].MedicinePrice} `;
-
-            displayRequiredCount();
-        }
-
+const editForm = document.getElementById("editMedicineForm") as HTMLFormElement;
+editForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    editMedicineQuantity = document.getElementById('editMedicineQuantity') as HTMLInputElement;
+    const item = MedicineList.find((item) => item.MedicineId == editingId);
+    if (item!=null) {
+        item.MedicineCount = parseInt(editMedicineQuantity.value);
+        
     }
-}
+    showMedicineDetails();
+    form.reset();
+    let medicineFormEdit = document.getElementById('medicineFormEdit') as HTMLDivElement;
+    medicineFormEdit.style.display = "none";
+  });
 
-function displayRequiredCount() {
-    let medicineInfo = document.getElementById('medicineInfo') as HTMLLabelElement;
-    let requiredCount = document.getElementById('requiredCount') as HTMLDivElement;
-
-    medicineInfo.style.display = "block";
-    requiredCount.style.display = "block";
-}
-
-function buyMedicine() {
-
-    let proceed : boolean = true;
-    let finalMedicineRequiredCount : number = 0;
-
-    let medicineList = document.getElementById('medicineList') as HTMLSelectElement;
-    let medicineRequiredCount = (document.getElementById('medicineRequiredCount') as HTMLInputElement).value;
-
-    let medicineName = medicineList[medicineList.selectedIndex].innerHTML;
-
-    let medicineRequiredCountRegex = /^\d{1,3}$/;
-
-    if (medicineRequiredCountRegex.test(medicineRequiredCount) && +medicineRequiredCount > 0) {
-        for (let i = 0; i < MedicineList.length; i++) {
-
-            if (MedicineList[i].MedicineName == medicineName) {
-
-                
-                if (MedicineList[i].MedicineCount > 0) {
-
-                    if((MedicineList[i].MedicineCount - +medicineRequiredCount) < 0)
-                    {
-                        proceed = confirm(`We only have ${MedicineList[i].MedicineCount} ${MedicineList[i].MedicineName}. Do you want to buy ${MedicineList[i].MedicineCount} ${MedicineList[i].MedicineName}?`)
-                        
-                        if(proceed)
-                        {
-                            finalMedicineRequiredCount = MedicineList[i].MedicineCount;
-                        }
-                    }
-                    else
-                    {
-                        finalMedicineRequiredCount = +medicineRequiredCount;
-                    }
-
-                    if(proceed)
-                    {
-                        MedicineList[i].MedicineCount = MedicineList[i].MedicineCount - finalMedicineRequiredCount;
-
-                        OrderList.push(new Order(MedicineList[i].MedicineId, CurrentUser.UserId, MedicineList[i].MedicineName, finalMedicineRequiredCount,MedicineList[i].MedicinePrice*MedicineList[i].MedicineCount, OrderStatus.Ordered ));
-                        alert("Purchase Success.");
-                        displayHomePage();
-                    }
-                   
-                }
-                else if(MedicineList[i].MedicineCount <= 0) {
-                    alert("Out of Stock, you can buy alternative medicine.");
-                }
-            }
-
-        }
+let editingId ="";
+const edit = (id: string) => {
+    
+    editingId = id;
+    showEditMedicineForm();
+    const item = MedicineList.find((item) => item.MedicineId == id);
+    if (item!=null) {
+        editMedicineName.value = item.MedicineName;
+        editMedicineQuantity.value = String(item.MedicineCount);
+        editMedicinePrice.value = String(item.MedicinePrice);
+        editMedicineExpiryDate.valueAsDate = item.MedicineExpiryDate;
     }
-    else {
-        alert("Please enter valid Required Count");
-    }
+  };
 
-
-}
+  const remove = (id: string) => {
+    MedicineList = MedicineList.filter((item) => item.MedicineId != id);
+    showMedicineDetails();
+  };
 
 function showBalance(){
-    let medicineDetailsTable = document.getElementById('medicineDetailsTable') as HTMLDivElement;
-    let purchaseMedicineTable = document.getElementById('purchaseMedicineTable') as HTMLDivElement;
-    let cancelOrderTable = document.getElementById('cancelOrderTable') as HTMLDivElement;
-    let recharge = document.getElementById('recharge') as HTMLDivElement;
+    hideAllHome();
     let showBalance = document.getElementById('showBalance') as HTMLDivElement;
-    let showOrderHistoryTable = document.getElementById('showOrderHistoryTable') as HTMLDivElement;
     
-    purchaseMedicineTable.style.display = "none";
-    cancelOrderTable.style.display = "none";
-    recharge.style.display = "none";
     showBalance.style.display = "block";
-    showOrderHistoryTable.style.display = "none";
-    medicineDetailsTable.style.display = "none";
-    showBalance.innerHTML = `Wallet Balance in Rs: ${CurrentUser.Balance}`;
+    
+    showBalance.innerHTML = ` <h2>Balance</h2><h3>Wallet Balance in Rs: ${CurrentUser.Balance}</h3>`;
 }
 
-function recharge(){
-    let medicineDetailsTable = document.getElementById('medicineDetailsTable') as HTMLDivElement;
-    let purchaseMedicineTable = document.getElementById('purchaseMedicineTable') as HTMLDivElement;
-    let cancelOrderTable = document.getElementById('cancelOrderTable') as HTMLDivElement;
+function addMoney(){
+    hideAllHome();
     let recharge = document.getElementById('recharge') as HTMLDivElement;
-    let showBalance = document.getElementById('showBalance') as HTMLDivElement;
-    let showOrderHistoryTable = document.getElementById('showOrderHistoryTable') as HTMLDivElement;
-    
-    purchaseMedicineTable.style.display = "none";
-    cancelOrderTable.style.display = "none";
     recharge.style.display = "block";
-    showBalance.style.display = "none";
-    showOrderHistoryTable.style.display = "none";
-    medicineDetailsTable.style.display = "none";
-    showBalance.innerHTML = `Wallet Balance in Rs: ${CurrentUser.Balance}`
+    let money = document.getElementById('addMoney') as HTMLInputElement;
+    
+    if(parseInt(money.value)<1){
+        alert('Enter valid amount to recharge');
+    }
+    else{
+        CurrentUser.Balance += parseFloat(money.value);
+        alert('Money added successfully');
+        money.value = "";
+    }
+    
 }
+
+function topUp(){
+    hideAllHome();
+    let recharge = document.getElementById('recharge') as HTMLDivElement;
+    recharge.style.display = "block";
+}
+
 
 function showOrderHistory(){
-    let medicineDetailsTable = document.getElementById('medicineDetailsTable') as HTMLDivElement;
-    let purchaseMedicineTable = document.getElementById('purchaseMedicineTable') as HTMLDivElement;
-    let cancelOrderTable = document.getElementById('cancelOrderTable') as HTMLDivElement;
-    let recharge = document.getElementById('recharge') as HTMLDivElement;
-    let showBalance = document.getElementById('showBalance') as HTMLDivElement;
-    let showOrderHistoryTable = document.getElementById('showOrderHistoryTable') as HTMLDivElement;
+    hideAllHome();
     
-    purchaseMedicineTable.style.display = "none";
-    cancelOrderTable.style.display = "none";
-    recharge.style.display = "none";
-    showBalance.style.display = "none";
+    let showOrderHistoryTable = document.getElementById('showOrderHistoryTable') as HTMLDivElement;
     showOrderHistoryTable.style.display = "block";
-    medicineDetailsTable.style.display = "none";
 
-    let tableHTML = "<table border='1'>";
-    tableHTML += "<tr><td>Order ID</td><td>Medicine ID</td><td>Medicine Name</td><td>Count</td><td>Total Price</td></tr>";
+    let tableHTML = "<h2>Orders</h2><table border='1'>";
+    tableHTML += "<tr><td>Order ID</td><td>Medicine ID</td><td>Medicine Name</td><td>Count</td><td>Total Price</td><td>Order Status</td></tr>";
     let orderCount: number = 0;
     for (let i = 0; i < OrderList.length; i++) {
         if (OrderList[i].UserId == CurrentUser.UserId ) {
-            tableHTML += `<tr><td>${OrderList[i].OrderId}</td><td>${OrderList[i].MedicineId}</td><td>${OrderList[i].MedicineName}</td><td>${OrderList[i].MedicineCount}</td><td>${OrderList[i].TotalPrice}</td></tr>`;
+            tableHTML += `<tr><td>${OrderList[i].OrderId}</td><td>${OrderList[i].MedicineId}</td><td>${OrderList[i].MedicineName}</td><td>${OrderList[i].MedicineCount}</td><td>${OrderList[i].TotalPrice}</td><td>${OrderList[i].OrderStatus}</td></tr>`;
             orderCount++;
         }
     }
     tableHTML +="</table>";
 
     if (orderCount == 0) {
-        showOrderHistoryTable.innerHTML = "Order History is empty.<br>";
+        showOrderHistoryTable.innerHTML = "<h2>Order History is empty.</h2>";
     }
     else{
         showOrderHistoryTable.innerHTML = tableHTML;
     }   
-    
 
 }
 
-function showMedicineDetails(){
-    let medicineDetailsTable = document.getElementById('medicineDetailsTable') as HTMLDivElement;
-    let purchaseMedicineTable = document.getElementById('purchaseMedicineTable') as HTMLDivElement;
-    let cancelOrderTable = document.getElementById('cancelOrderTable') as HTMLDivElement;
-    let recharge = document.getElementById('recharge') as HTMLDivElement;
-    let showBalance = document.getElementById('showBalance') as HTMLDivElement;
-    let showOrderHistoryTable = document.getElementById('showOrderHistoryTable') as HTMLDivElement;
+function cancelOrder(){
+    hideAllHome();
     
-    purchaseMedicineTable.style.display = "none";
-    cancelOrderTable.style.display = "none";
-    recharge.style.display = "none";
-    showBalance.style.display = "none";
-    showOrderHistoryTable.style.display = "none";
+    let cancelOrderTable = document.getElementById('cancelOrderTable') as HTMLDivElement;
+    cancelOrderTable.style.display = "block";
+
+    let tableHTML = "<h2>Cancel Order</h2><table border='1'>";
+    tableHTML += "<tr><td>Order ID</td><td>Medicine ID</td><td>Medicine Name</td><td>Count</td><td>Total Price</td><td>Order Status</td></tr>";
+    let orderCount: number = 0;
+    for (let i = 0; i < OrderList.length; i++) {
+        if (OrderList[i].UserId == CurrentUser.UserId && OrderList[i].OrderStatus == OrderStatus.Ordered) {
+            tableHTML += `<tr><td>${OrderList[i].OrderId}</td><td>${OrderList[i].MedicineId}</td><td>${OrderList[i].MedicineName}</td><td>${OrderList[i].MedicineCount}</td><td>${OrderList[i].TotalPrice}</td><td>${OrderList[i].OrderStatus}</td><td><button onclick="cancel('${OrderList[i].OrderId}')">Cancel</button></td></tr>`;
+            orderCount++;
+        }
+    }
+    tableHTML +="</table>";
+
+    if (orderCount == 0) {
+        cancelOrderTable.innerHTML = "<h2>Order History is empty to cancel.</h2>";
+    }
+    else{
+        cancelOrderTable.innerHTML = tableHTML;
+    }   
+
+}
+//cancel order
+const cancel = (id: string) => {
+    for(var i=0;i<OrderList.length;i++){
+        if(OrderList[i].OrderId == id && CurrentUser.UserId == OrderList[i].UserId){
+            CurrentUser.Balance += OrderList[i].TotalPrice;
+            let item = MedicineList.find((item) => item.MedicineId == OrderList[i].MedicineId);
+            if(item!=null){
+                item.MedicineCount += OrderList[i].MedicineCount;
+            }
+            OrderList[i].OrderStatus = OrderStatus.Cancelled;
+            break;
+        }
+    }
+    MedicineList = MedicineList.filter((item) => item.MedicineId != id);
+    alert('Order cancelled successfully');
+    cancelOrder();
+  };
+
+function purchaseMedicine(){
+    hideAllHome();
+    let purchaseMedicineTable = document.getElementById('purchaseMedicineTable') as HTMLDivElement;
+    purchaseMedicineTable.style.display = "block";
+    let tableHTML = "<h3>PurchaseMedicine</h3>";
+    tableHTML += "<table border='1'>";
+    tableHTML += "<tr><th>Medicine Name</th><th>Count</th><th>Price</th><th>Expiry date</th><th></th></tr>";
+    for (let i = 0; i < MedicineList.length; i++) {
+        if (MedicineList[i].MedicineExpiryDate > new Date() && MedicineList[i].MedicineCount>0) {
+            tableHTML += `<tr><td>${MedicineList[i].MedicineName}</td><td>${MedicineList[i].MedicineCount}</td><td>${MedicineList[i].MedicinePrice}</td><td>${MedicineList[i].MedicineExpiryDate.toLocaleDateString('en-GB')}</td>
+            <td><input type="number" value="0" style="width:5rem; margin-right:1rem;" min="1" max="${MedicineList[i].MedicineCount}" id="${MedicineList[i].MedicineId}Quantity">
+            <button onclick="purchase('${MedicineList[i].MedicineId}','${MedicineList[i].MedicineId}Quantity')">Purchase</button></td></tr>`;
+        }
+    }
+    tableHTML += "</table>";
+    purchaseMedicineTable.innerHTML = tableHTML;
+
+}
+
+function purchase(paramMedicineID:string, newQuantityElement:string){
+    let item = MedicineList.find((item) => item.MedicineId == paramMedicineID);
+    let newQuantity = document.getElementById(newQuantityElement) as HTMLInputElement;
+    
+    let oldQuantity:number = 0;
+    let amount: number = 0;
+    if(item!=null){
+        oldQuantity = item.MedicineCount;
+        amount = parseInt(newQuantity.value)* item.MedicinePrice;
+    }
+    
+    
+    if(parseInt(newQuantity.value) > oldQuantity){
+        alert('Quantity is not available');
+    }
+    else if(parseInt(newQuantity.value)<1){
+        alert('Enter valid quantity to purchase');
+    }
+    else if(amount > CurrentUser.Balance){
+        alert("Invalid balance in wallet");
+    }
+    else{
+        CurrentUser.Balance -= amount;
+        if(item!=null){
+            item.MedicineCount -= parseInt(newQuantity.value);
+            OrderList.push(new Order(item.MedicineId, CurrentUser.UserId, item.MedicineName, parseInt(newQuantity.value), amount, OrderStatus.Ordered));
+            alert('Medicine purchase successfully');
+        }
+    }
+    purchaseMedicine();
+    
+}
+
+
+function showMedicineDetails(){
+    hideAllHome();
+    let medicineDetailsTable = document.getElementById('medicineDetailsTable') as HTMLDivElement;
+    let medicineDetailsPage = document.getElementById('medicineDetailsPage') as HTMLButtonElement;
     medicineDetailsTable.style.display = "block";
+    medicineDetailsPage.style.display ="block";
 
     let tableHTML = "<h3>Medicine</h3>";
     tableHTML += "<table border='1'>";
-    tableHTML += "<tr><td>Medicine Name</td><td>Count</td><td>Price</td><td>Expiry date</td></tr>";
+    tableHTML += "<tr><th>Medicine Name</th><th>Count</th><th>Price</th><th>Expiry date</th><th></th></tr>";
     for (let i = 0; i < MedicineList.length; i++) {
         if (MedicineList[i].MedicineExpiryDate > new Date()) {
-            tableHTML += `<tr><td>${MedicineList[i].MedicineName}</td><td>${MedicineList[i].MedicineCount}</td><td>${MedicineList[i].MedicinePrice}</td><td>${MedicineList[i].MedicineExpiryDate.toLocaleDateString('en-GB')}</td></tr>`;
+            tableHTML += `<tr><td>${MedicineList[i].MedicineName}</td><td>${MedicineList[i].MedicineCount}</td><td>${MedicineList[i].MedicinePrice}</td><td>${MedicineList[i].MedicineExpiryDate.toLocaleDateString('en-GB')}</td>
+            <td><button onclick="edit('${MedicineList[i].MedicineId}')">Edit</button><button onclick="remove('${MedicineList[i].MedicineId}')">Delete</button></td></tr>`;
         }
     }
     tableHTML += "</table>";
@@ -495,34 +534,54 @@ function showMedicineDetails(){
     
 }
 
+function showMedicineForm(){
+    let medicineForm = document.getElementById("medicineForm") as HTMLDivElement;
+    medicineForm.style.display = "block";
+} 
+function showEditMedicineForm(){
+    
+    let editMedicineForm = document.getElementById("editMedicineForm") as HTMLDivElement;
+    editMedicineForm.style.display = "block";
+    let medicineFormEdit = document.getElementById("medicineFormEdit") as HTMLDivElement;
+    medicineFormEdit.style.display = "block";
+} 
 
 function displayHomePage() {
+    hideAllHome();
     CurrentUser = new User("","","",0);
-
-    let medicineList = document.getElementById('medicineList') as HTMLSelectElement;
-    medicineList.selectedIndex = 0;
-
-    let requiredCount = document.getElementById('requiredCount') as HTMLDivElement;
-    let medicineDetailsTable = document.getElementById('medicineDetailsTable') as HTMLLabelElement;
-
-    let historyDisplay = document.getElementById('historyDisplay') as HTMLLabelElement;
-
+    
+    let menu = document.getElementById('menu') as HTMLDivElement;
+    menu.style.display = "none";
     let medicinePage = document.getElementById('medicinePage') as HTMLDivElement;
+    medicinePage.style.display = "none";
+    
+    let homePage = document.getElementById('homePage') as HTMLDivElement;
+    
+    homePage.style.display = "block";
+}
+
+function hideAllHome(){
+    let medicineDetailsTable = document.getElementById('medicineDetailsTable') as HTMLLabelElement;
+    let medicineDetailsPage = document.getElementById('medicineDetailsPage') as HTMLLabelElement;
+    let purchaseMedicineTable = document.getElementById('purchaseMedicineTable') as HTMLLabelElement;
+    let cancelOrderTable = document.getElementById('cancelOrderTable') as HTMLLabelElement;
     let newUserPage = document.getElementById('newUserPage') as HTMLDivElement;
     let existingUserPage = document.getElementById('existingUserPage') as HTMLDivElement;
     let homePage = document.getElementById('homePage') as HTMLDivElement;
-    let menu = document.getElementById('menu') as HTMLDivElement;
-
-    // (document.getElementById('medicineRequiredCount') as HTMLInputElement).value = null;
-    // (document.getElementById('existingUserId') as HTMLInputElement).value = null;
-
-    // requiredCount.style.display = "none";
-    // historyDisplay.style.display = "none";
-    menu.style.display = "none";
-    medicinePage.style.display = "none";
-    // medicineInfo.style.display = "none";
-    newUserPage.style.display = "none";
-    existingUserPage.style.display = "none";
+    let recharge = document.getElementById('recharge') as HTMLDivElement;
+    let showBalance = document.getElementById('showBalance') as HTMLDivElement;
+    let showOrderHistoryTable = document.getElementById('showOrderHistoryTable') as HTMLDivElement;
+    let greet = document.getElementById('greet') as HTMLDivElement;
+    
     medicineDetailsTable.style.display ="none";
-    homePage.style.display = "block";
+    medicineDetailsPage.style.display ="none";
+    purchaseMedicineTable.style.display ="none";
+    cancelOrderTable.style.display ="none";
+    newUserPage.style.display ="none";
+    existingUserPage.style.display ="none";
+    homePage.style.display ="none";
+    recharge.style.display ="none";
+    showBalance.style.display ="none";
+    showOrderHistoryTable.style.display ="none";
+    greet.style.display = "none";
 }

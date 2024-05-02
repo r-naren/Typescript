@@ -30,9 +30,8 @@ class MedicineInfo {
 }
 var OrderStatus;
 (function (OrderStatus) {
-    OrderStatus[OrderStatus["Initiated"] = 0] = "Initiated";
-    OrderStatus[OrderStatus["Ordered"] = 1] = "Ordered";
-    OrderStatus[OrderStatus["Cancelled"] = 2] = "Cancelled";
+    OrderStatus["Ordered"] = "Ordered";
+    OrderStatus["Cancelled"] = "Cancelled";
 })(OrderStatus || (OrderStatus = {}));
 class Order {
     constructor(paramMedicineId, paramUserId, paramMedicineName, paramMedicineCount, paramTotalPrice, paramOrderStatus) {
@@ -57,10 +56,13 @@ MedicineList.push(new MedicineInfo("Iodex", 5, 80, new Date(2025, 4, 7)));
 MedicineList.push(new MedicineInfo("Acetherol", 5, 100, new Date(2025, 4, 7)));
 let OrderList = new Array();
 function newUserPage() {
-    let homePage = document.getElementById('homePage');
+    hideAllHome();
     let newUserPage = document.getElementById('newUserPage');
-    homePage.style.display = "none";
+    let existingUserPage = document.getElementById('existingUserPage');
+    let homePage = document.getElementById('homePage');
+    homePage.style.display = "block";
     newUserPage.style.display = "block";
+    existingUserPage.style.display = "none";
 }
 function signUp() {
     if (NewEmailStatus == true &&
@@ -170,7 +172,7 @@ function checkNewUserConfirmPassword(paramNewUserConfirmPassword, paramNewUserPa
 function checkNewUserPhoneNumber(paramNewUserPhoneNumber) {
     let newUserPhoneNumber = document.getElementById(paramNewUserPhoneNumber).value;
     let newUserPhoneNumberMessage = document.getElementById(paramNewUserPhoneNumber + "Message");
-    let newUserPhoneNumberRegex = /^[7-9][0-9]{9}$/;
+    let newUserPhoneNumberRegex = /^[7-9]{1}[0-9]{9}$/;
     if (newUserPhoneNumberRegex.test(newUserPhoneNumber)) {
         NewUserPhoneNumberStatus = true;
         newUserPhoneNumberMessage.style.visibility = "hidden";
@@ -179,20 +181,15 @@ function checkNewUserPhoneNumber(paramNewUserPhoneNumber) {
         NewUserPhoneNumberStatus = false;
         newUserPhoneNumberMessage.innerHTML = "Please enter valid phone number";
         newUserPhoneNumberMessage.style.visibility = "visible";
-        newUserPhoneNumberMessage.style.color = "tomato";
-        newUserPhoneNumberMessage.style.marginLeft = "10px";
+        newUserPhoneNumberMessage.style.color = "red";
+        newUserPhoneNumberMessage.style.marginLeft = "0.6rem";
     }
 }
 function existingUserPage() {
-    let homePage = document.getElementById('homePage');
+    let newUserPage = document.getElementById('newUserPage');
     let existingUserPage = document.getElementById('existingUserPage');
-    let availableUser = document.getElementById('availableUser');
-    homePage.style.display = "none";
+    newUserPage.style.display = "none";
     existingUserPage.style.display = "block";
-    // availableUser.innerHTML = "<h2>Available User</h2>";
-    // for (let i = 0; i < UserArrayList.length; i++) {
-    //     availableUser.innerHTML += `User Email : ${UserArrayList[i].Email} | User Id : ${UserArrayList[i].UserId}<br>`;
-    // }
 }
 function signIn() {
     let noExistingUserIdChecker = true;
@@ -219,176 +216,249 @@ function signIn() {
     }
 }
 function medicinePage() {
-    let existingUserPage = document.getElementById('existingUserPage');
+    hideAllHome();
     let medicinePage = document.getElementById('medicinePage');
-    let medicineDetailsTable = document.getElementById('medicineDetailsTable');
     let menu = document.getElementById('menu');
     let greet = document.getElementById('greet');
-    medicineDetailsTable.style.display = "none";
-    existingUserPage.style.display = "none";
     medicinePage.style.display = "block";
     menu.style.display = "block";
+    greet.style.display = "block";
     greet.innerHTML = `<h3>Hello ${CurrentUser.Email}</h3>`;
 }
-function medicineListCheck() {
-    let medicineInfo = document.getElementById('medicineInfo');
-    let medicineList = document.getElementById('medicineList');
-    let medicineName = medicineList[medicineList.selectedIndex].innerHTML;
-    for (let i = 0; i < MedicineList.length; i++) {
-        if (MedicineList[i].MedicineName == medicineName) {
-            medicineInfo.innerHTML = `Medicine Id : ${MedicineList[i].MedicineId} --- Medicine Name : ${MedicineList[i].MedicineName} --- Medicine Count : ${MedicineList[i].MedicineCount} --- Medicine Price : ${MedicineList[i].MedicinePrice} `;
-            displayRequiredCount();
-        }
+const form = document.getElementById("addMedicineForm");
+const medicineName = document.getElementById('medicineName');
+const medicineQuantity = document.getElementById('medicineQuantity');
+const medicinePrice = document.getElementById('medicinePrice');
+const medicineExpiryDate = document.getElementById('medicineExpiryDate');
+const editMedicineName = document.getElementById('editMedicineName');
+let editMedicineQuantity = document.getElementById('editMedicineQuantity');
+const editMedicinePrice = document.getElementById('editMedicinePrice');
+const editMedicineExpiryDate = document.getElementById('editMedicineExpiryDate');
+form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    MedicineList.push(new MedicineInfo(medicineName.value, parseInt(medicineQuantity.value), parseFloat(medicinePrice.value), new Date(medicineExpiryDate.value)));
+    showMedicineDetails();
+    form.reset();
+    let medicineForm = document.getElementById('medicineForm');
+    medicineForm.style.display = "none";
+});
+const editForm = document.getElementById("editMedicineForm");
+editForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    editMedicineQuantity = document.getElementById('editMedicineQuantity');
+    const item = MedicineList.find((item) => item.MedicineId == editingId);
+    if (item != null) {
+        item.MedicineCount = parseInt(editMedicineQuantity.value);
     }
+    showMedicineDetails();
+    form.reset();
+    let medicineFormEdit = document.getElementById('medicineFormEdit');
+    medicineFormEdit.style.display = "none";
+});
+let editingId = "";
+const edit = (id) => {
+    editingId = id;
+    showEditMedicineForm();
+    const item = MedicineList.find((item) => item.MedicineId == id);
+    if (item != null) {
+        editMedicineName.value = item.MedicineName;
+        editMedicineQuantity.value = String(item.MedicineCount);
+        editMedicinePrice.value = String(item.MedicinePrice);
+        editMedicineExpiryDate.valueAsDate = item.MedicineExpiryDate;
+    }
+};
+const remove = (id) => {
+    MedicineList = MedicineList.filter((item) => item.MedicineId != id);
+    showMedicineDetails();
+};
+function showBalance() {
+    hideAllHome();
+    let showBalance = document.getElementById('showBalance');
+    showBalance.style.display = "block";
+    showBalance.innerHTML = ` <h2>Balance</h2><h3>Wallet Balance in Rs: ${CurrentUser.Balance}</h3>`;
 }
-function displayRequiredCount() {
-    let medicineInfo = document.getElementById('medicineInfo');
-    let requiredCount = document.getElementById('requiredCount');
-    medicineInfo.style.display = "block";
-    requiredCount.style.display = "block";
-}
-function buyMedicine() {
-    let proceed = true;
-    let finalMedicineRequiredCount = 0;
-    let medicineList = document.getElementById('medicineList');
-    let medicineRequiredCount = document.getElementById('medicineRequiredCount').value;
-    let medicineName = medicineList[medicineList.selectedIndex].innerHTML;
-    let medicineRequiredCountRegex = /^\d{1,3}$/;
-    if (medicineRequiredCountRegex.test(medicineRequiredCount) && +medicineRequiredCount > 0) {
-        for (let i = 0; i < MedicineList.length; i++) {
-            if (MedicineList[i].MedicineName == medicineName) {
-                if (MedicineList[i].MedicineCount > 0) {
-                    if ((MedicineList[i].MedicineCount - +medicineRequiredCount) < 0) {
-                        proceed = confirm(`We only have ${MedicineList[i].MedicineCount} ${MedicineList[i].MedicineName}. Do you want to buy ${MedicineList[i].MedicineCount} ${MedicineList[i].MedicineName}?`);
-                        if (proceed) {
-                            finalMedicineRequiredCount = MedicineList[i].MedicineCount;
-                        }
-                    }
-                    else {
-                        finalMedicineRequiredCount = +medicineRequiredCount;
-                    }
-                    if (proceed) {
-                        MedicineList[i].MedicineCount = MedicineList[i].MedicineCount - finalMedicineRequiredCount;
-                        OrderList.push(new Order(MedicineList[i].MedicineId, CurrentUser.UserId, MedicineList[i].MedicineName, finalMedicineRequiredCount, MedicineList[i].MedicinePrice * MedicineList[i].MedicineCount, OrderStatus.Ordered));
-                        alert("Purchase Success.");
-                        displayHomePage();
-                    }
-                }
-                else if (MedicineList[i].MedicineCount <= 0) {
-                    alert("Out of Stock, you can buy alternative medicine.");
-                }
-            }
-        }
+function addMoney() {
+    hideAllHome();
+    let recharge = document.getElementById('recharge');
+    recharge.style.display = "block";
+    let money = document.getElementById('addMoney');
+    if (parseInt(money.value) < 1) {
+        alert('Enter valid amount to recharge');
     }
     else {
-        alert("Please enter valid Required Count");
+        CurrentUser.Balance += parseFloat(money.value);
+        alert('Money added successfully');
+        money.value = "";
     }
 }
-function showBalance() {
-    let medicineDetailsTable = document.getElementById('medicineDetailsTable');
-    let purchaseMedicineTable = document.getElementById('purchaseMedicineTable');
-    let cancelOrderTable = document.getElementById('cancelOrderTable');
+function topUp() {
+    hideAllHome();
     let recharge = document.getElementById('recharge');
-    let showBalance = document.getElementById('showBalance');
-    let showOrderHistoryTable = document.getElementById('showOrderHistoryTable');
-    purchaseMedicineTable.style.display = "none";
-    cancelOrderTable.style.display = "none";
-    recharge.style.display = "none";
-    showBalance.style.display = "block";
-    showOrderHistoryTable.style.display = "none";
-    medicineDetailsTable.style.display = "none";
-    showBalance.innerHTML = `Wallet Balance in Rs: ${CurrentUser.Balance}`;
-}
-function recharge() {
-    let medicineDetailsTable = document.getElementById('medicineDetailsTable');
-    let purchaseMedicineTable = document.getElementById('purchaseMedicineTable');
-    let cancelOrderTable = document.getElementById('cancelOrderTable');
-    let recharge = document.getElementById('recharge');
-    let showBalance = document.getElementById('showBalance');
-    let showOrderHistoryTable = document.getElementById('showOrderHistoryTable');
-    purchaseMedicineTable.style.display = "none";
-    cancelOrderTable.style.display = "none";
     recharge.style.display = "block";
-    showBalance.style.display = "none";
-    showOrderHistoryTable.style.display = "none";
-    medicineDetailsTable.style.display = "none";
-    showBalance.innerHTML = `Wallet Balance in Rs: ${CurrentUser.Balance}`;
 }
 function showOrderHistory() {
-    let medicineDetailsTable = document.getElementById('medicineDetailsTable');
-    let purchaseMedicineTable = document.getElementById('purchaseMedicineTable');
-    let cancelOrderTable = document.getElementById('cancelOrderTable');
-    let recharge = document.getElementById('recharge');
-    let showBalance = document.getElementById('showBalance');
+    hideAllHome();
     let showOrderHistoryTable = document.getElementById('showOrderHistoryTable');
-    purchaseMedicineTable.style.display = "none";
-    cancelOrderTable.style.display = "none";
-    recharge.style.display = "none";
-    showBalance.style.display = "none";
     showOrderHistoryTable.style.display = "block";
-    medicineDetailsTable.style.display = "none";
-    let tableHTML = "<table border='1'>";
-    tableHTML += "<tr><td>Order ID</td><td>Medicine ID</td><td>Medicine Name</td><td>Count</td><td>Total Price</td></tr>";
+    let tableHTML = "<h2>Orders</h2><table border='1'>";
+    tableHTML += "<tr><td>Order ID</td><td>Medicine ID</td><td>Medicine Name</td><td>Count</td><td>Total Price</td><td>Order Status</td></tr>";
     let orderCount = 0;
     for (let i = 0; i < OrderList.length; i++) {
         if (OrderList[i].UserId == CurrentUser.UserId) {
-            tableHTML += `<tr><td>${OrderList[i].OrderId}</td><td>${OrderList[i].MedicineId}</td><td>${OrderList[i].MedicineName}</td><td>${OrderList[i].MedicineCount}</td><td>${OrderList[i].TotalPrice}</td></tr>`;
+            tableHTML += `<tr><td>${OrderList[i].OrderId}</td><td>${OrderList[i].MedicineId}</td><td>${OrderList[i].MedicineName}</td><td>${OrderList[i].MedicineCount}</td><td>${OrderList[i].TotalPrice}</td><td>${OrderList[i].OrderStatus}</td></tr>`;
             orderCount++;
         }
     }
     tableHTML += "</table>";
     if (orderCount == 0) {
-        showOrderHistoryTable.innerHTML = "Order History is empty.<br>";
+        showOrderHistoryTable.innerHTML = "<h2>Order History is empty.</h2>";
     }
     else {
         showOrderHistoryTable.innerHTML = tableHTML;
     }
 }
-function showMedicineDetails() {
-    let medicineDetailsTable = document.getElementById('medicineDetailsTable');
-    let purchaseMedicineTable = document.getElementById('purchaseMedicineTable');
+function cancelOrder() {
+    hideAllHome();
     let cancelOrderTable = document.getElementById('cancelOrderTable');
-    let recharge = document.getElementById('recharge');
-    let showBalance = document.getElementById('showBalance');
-    let showOrderHistoryTable = document.getElementById('showOrderHistoryTable');
-    purchaseMedicineTable.style.display = "none";
-    cancelOrderTable.style.display = "none";
-    recharge.style.display = "none";
-    showBalance.style.display = "none";
-    showOrderHistoryTable.style.display = "none";
+    cancelOrderTable.style.display = "block";
+    let tableHTML = "<h2>Cancel Order</h2><table border='1'>";
+    tableHTML += "<tr><td>Order ID</td><td>Medicine ID</td><td>Medicine Name</td><td>Count</td><td>Total Price</td><td>Order Status</td></tr>";
+    let orderCount = 0;
+    for (let i = 0; i < OrderList.length; i++) {
+        if (OrderList[i].UserId == CurrentUser.UserId && OrderList[i].OrderStatus == OrderStatus.Ordered) {
+            tableHTML += `<tr><td>${OrderList[i].OrderId}</td><td>${OrderList[i].MedicineId}</td><td>${OrderList[i].MedicineName}</td><td>${OrderList[i].MedicineCount}</td><td>${OrderList[i].TotalPrice}</td><td>${OrderList[i].OrderStatus}</td><td><button onclick="cancel('${OrderList[i].OrderId}')">Cancel</button></td></tr>`;
+            orderCount++;
+        }
+    }
+    tableHTML += "</table>";
+    if (orderCount == 0) {
+        cancelOrderTable.innerHTML = "<h2>Order History is empty to cancel.</h2>";
+    }
+    else {
+        cancelOrderTable.innerHTML = tableHTML;
+    }
+}
+//cancel order
+const cancel = (id) => {
+    for (var i = 0; i < OrderList.length; i++) {
+        if (OrderList[i].OrderId == id && CurrentUser.UserId == OrderList[i].UserId) {
+            CurrentUser.Balance += OrderList[i].TotalPrice;
+            let item = MedicineList.find((item) => item.MedicineId == OrderList[i].MedicineId);
+            if (item != null) {
+                item.MedicineCount += OrderList[i].MedicineCount;
+            }
+            OrderList[i].OrderStatus = OrderStatus.Cancelled;
+            break;
+        }
+    }
+    MedicineList = MedicineList.filter((item) => item.MedicineId != id);
+    alert('Order cancelled successfully');
+    cancelOrder();
+};
+function purchaseMedicine() {
+    hideAllHome();
+    let purchaseMedicineTable = document.getElementById('purchaseMedicineTable');
+    purchaseMedicineTable.style.display = "block";
+    let tableHTML = "<h3>PurchaseMedicine</h3>";
+    tableHTML += "<table border='1'>";
+    tableHTML += "<tr><th>Medicine Name</th><th>Count</th><th>Price</th><th>Expiry date</th><th></th></tr>";
+    for (let i = 0; i < MedicineList.length; i++) {
+        if (MedicineList[i].MedicineExpiryDate > new Date() && MedicineList[i].MedicineCount > 0) {
+            tableHTML += `<tr><td>${MedicineList[i].MedicineName}</td><td>${MedicineList[i].MedicineCount}</td><td>${MedicineList[i].MedicinePrice}</td><td>${MedicineList[i].MedicineExpiryDate.toLocaleDateString('en-GB')}</td>
+            <td><input type="number" value="0" style="width:5rem; margin-right:1rem;" min="1" max="${MedicineList[i].MedicineCount}" id="${MedicineList[i].MedicineId}Quantity">
+            <button onclick="purchase('${MedicineList[i].MedicineId}','${MedicineList[i].MedicineId}Quantity')">Purchase</button></td></tr>`;
+        }
+    }
+    tableHTML += "</table>";
+    purchaseMedicineTable.innerHTML = tableHTML;
+}
+function purchase(paramMedicineID, newQuantityElement) {
+    let item = MedicineList.find((item) => item.MedicineId == paramMedicineID);
+    let newQuantity = document.getElementById(newQuantityElement);
+    let oldQuantity = 0;
+    let amount = 0;
+    if (item != null) {
+        oldQuantity = item.MedicineCount;
+        amount = parseInt(newQuantity.value) * item.MedicinePrice;
+    }
+    if (parseInt(newQuantity.value) > oldQuantity) {
+        alert('Quantity is not available');
+    }
+    else if (parseInt(newQuantity.value) < 1) {
+        alert('Enter valid quantity to purchase');
+    }
+    else if (amount > CurrentUser.Balance) {
+        alert("Invalid balance in wallet");
+    }
+    else {
+        CurrentUser.Balance -= amount;
+        if (item != null) {
+            item.MedicineCount -= parseInt(newQuantity.value);
+            OrderList.push(new Order(item.MedicineId, CurrentUser.UserId, item.MedicineName, parseInt(newQuantity.value), amount, OrderStatus.Ordered));
+            alert('Medicine purchase successfully');
+        }
+    }
+    purchaseMedicine();
+}
+function showMedicineDetails() {
+    hideAllHome();
+    let medicineDetailsTable = document.getElementById('medicineDetailsTable');
+    let medicineDetailsPage = document.getElementById('medicineDetailsPage');
     medicineDetailsTable.style.display = "block";
+    medicineDetailsPage.style.display = "block";
     let tableHTML = "<h3>Medicine</h3>";
     tableHTML += "<table border='1'>";
-    tableHTML += "<tr><td>Medicine Name</td><td>Count</td><td>Price</td><td>Expiry date</td></tr>";
+    tableHTML += "<tr><th>Medicine Name</th><th>Count</th><th>Price</th><th>Expiry date</th><th></th></tr>";
     for (let i = 0; i < MedicineList.length; i++) {
         if (MedicineList[i].MedicineExpiryDate > new Date()) {
-            tableHTML += `<tr><td>${MedicineList[i].MedicineName}</td><td>${MedicineList[i].MedicineCount}</td><td>${MedicineList[i].MedicinePrice}</td><td>${MedicineList[i].MedicineExpiryDate.toLocaleDateString('en-GB')}</td></tr>`;
+            tableHTML += `<tr><td>${MedicineList[i].MedicineName}</td><td>${MedicineList[i].MedicineCount}</td><td>${MedicineList[i].MedicinePrice}</td><td>${MedicineList[i].MedicineExpiryDate.toLocaleDateString('en-GB')}</td>
+            <td><button onclick="edit('${MedicineList[i].MedicineId}')">Edit</button><button onclick="remove('${MedicineList[i].MedicineId}')">Delete</button></td></tr>`;
         }
     }
     tableHTML += "</table>";
     medicineDetailsTable.innerHTML = tableHTML;
 }
+function showMedicineForm() {
+    let medicineForm = document.getElementById("medicineForm");
+    medicineForm.style.display = "block";
+}
+function showEditMedicineForm() {
+    let editMedicineForm = document.getElementById("editMedicineForm");
+    editMedicineForm.style.display = "block";
+    let medicineFormEdit = document.getElementById("medicineFormEdit");
+    medicineFormEdit.style.display = "block";
+}
 function displayHomePage() {
+    hideAllHome();
     CurrentUser = new User("", "", "", 0);
-    let medicineList = document.getElementById('medicineList');
-    medicineList.selectedIndex = 0;
-    let requiredCount = document.getElementById('requiredCount');
-    let medicineDetailsTable = document.getElementById('medicineDetailsTable');
-    let historyDisplay = document.getElementById('historyDisplay');
+    let menu = document.getElementById('menu');
+    menu.style.display = "none";
     let medicinePage = document.getElementById('medicinePage');
+    medicinePage.style.display = "none";
+    let homePage = document.getElementById('homePage');
+    homePage.style.display = "block";
+}
+function hideAllHome() {
+    let medicineDetailsTable = document.getElementById('medicineDetailsTable');
+    let medicineDetailsPage = document.getElementById('medicineDetailsPage');
+    let purchaseMedicineTable = document.getElementById('purchaseMedicineTable');
+    let cancelOrderTable = document.getElementById('cancelOrderTable');
     let newUserPage = document.getElementById('newUserPage');
     let existingUserPage = document.getElementById('existingUserPage');
     let homePage = document.getElementById('homePage');
-    let menu = document.getElementById('menu');
-    // (document.getElementById('medicineRequiredCount') as HTMLInputElement).value = null;
-    // (document.getElementById('existingUserId') as HTMLInputElement).value = null;
-    // requiredCount.style.display = "none";
-    // historyDisplay.style.display = "none";
-    menu.style.display = "none";
-    medicinePage.style.display = "none";
-    // medicineInfo.style.display = "none";
+    let recharge = document.getElementById('recharge');
+    let showBalance = document.getElementById('showBalance');
+    let showOrderHistoryTable = document.getElementById('showOrderHistoryTable');
+    let greet = document.getElementById('greet');
+    medicineDetailsTable.style.display = "none";
+    medicineDetailsPage.style.display = "none";
+    purchaseMedicineTable.style.display = "none";
+    cancelOrderTable.style.display = "none";
     newUserPage.style.display = "none";
     existingUserPage.style.display = "none";
-    medicineDetailsTable.style.display = "none";
-    homePage.style.display = "block";
+    homePage.style.display = "none";
+    recharge.style.display = "none";
+    showBalance.style.display = "none";
+    showOrderHistoryTable.style.display = "none";
+    greet.style.display = "none";
 }
