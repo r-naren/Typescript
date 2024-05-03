@@ -8,20 +8,24 @@ let NewUserPasswordStatus = false;
 let NewUserConfirmPasswordStatus = false;
 let NewUserPhoneNumberStatus = false;
 let isEmailExist = false;
+let NewNameStatus = false;
+//user class
 class User {
-    constructor(paramEmail, paramPassword, paramUserPhoneNumber, paramBalance) {
+    constructor(paramName, paramEmail, paramPassword, paramUserPhoneNumber, paramBalance) {
         UserIdAutoIncrement++;
-        this.UserId = "UI" + UserIdAutoIncrement.toString();
+        this.UserId = "UID" + UserIdAutoIncrement.toString();
+        this.UserName = paramName;
         this.Email = paramEmail;
         this.Password = paramPassword;
         this.UserPhoneNumber = paramUserPhoneNumber;
         this.Balance = paramBalance;
     }
 }
+//med
 class MedicineInfo {
     constructor(paramMedicineName, paramMedicineCount, paramMedicinePrice, MedicineExpiryDate) {
         MedicineIdAutoIncrement++;
-        this.MedicineId = "MD" + MedicineIdAutoIncrement.toString();
+        this.MedicineId = "MID" + MedicineIdAutoIncrement.toString();
         this.MedicineName = paramMedicineName;
         this.MedicineCount = paramMedicineCount;
         this.MedicinePrice = paramMedicinePrice;
@@ -34,32 +38,41 @@ var OrderStatus;
     OrderStatus["Cancelled"] = "Cancelled";
 })(OrderStatus || (OrderStatus = {}));
 class Order {
-    constructor(paramMedicineId, paramUserId, paramMedicineName, paramMedicineCount, paramTotalPrice, paramOrderStatus) {
+    constructor(paramMedicineId, paramUserId, paramMedicineName, paramMedicineCount, paramTotalPrice, paramOrderStatus, paramOrderDate) {
         OrderIdAutoIncrement++;
-        this.OrderId = "OI" + OrderIdAutoIncrement.toString();
+        this.OrderId = "OID" + OrderIdAutoIncrement.toString();
         this.MedicineId = paramMedicineId;
         this.UserId = paramUserId;
         this.OrderStatus = paramOrderStatus;
         this.MedicineName = paramMedicineName;
         this.MedicineCount = paramMedicineCount;
         this.TotalPrice = paramTotalPrice;
+        this.OrderDate = paramOrderDate;
     }
 }
 let UserArrayList = new Array();
-UserArrayList.push(new User("naren@gmail.com", "Password@123", "9876453210", 0));
-UserArrayList.push(new User("ravi@gmail.com", "Password@123", "9123456780", 0));
+UserArrayList.push(new User("Naren", "naren@gmail.com", "Password@123", "9876453210", 100));
+UserArrayList.push(new User("Ravi", "ravi@gmail.com", "Password@123", "9123456780", 0));
 let MedicineList = new Array();
 MedicineList.push(new MedicineInfo("Paracetomol", 5, 50, new Date(2025, 4, 7)));
-MedicineList.push(new MedicineInfo("Colpal", 5, 60, new Date(2023, 4, 7)));
-MedicineList.push(new MedicineInfo("Stepsil", 5, 70, new Date(2024, 5, 3)));
-MedicineList.push(new MedicineInfo("Iodex", 5, 80, new Date(2025, 4, 7)));
-MedicineList.push(new MedicineInfo("Acetherol", 5, 100, new Date(2025, 4, 7)));
+MedicineList.push(new MedicineInfo("Colpal", 5, 60, new Date("2025-04-07")));
+MedicineList.push(new MedicineInfo("Stepsil", 5, 70, new Date("2024-05-03")));
+MedicineList.push(new MedicineInfo("Iodex", 5, 80, new Date("2025-04-07")));
+MedicineList.push(new MedicineInfo("Acetherol", 5, 100, new Date("2025-04-07")));
 let OrderList = new Array();
 function newUserPage() {
     hideAllHome();
     let newUserPage = document.getElementById('newUserPage');
     let existingUserPage = document.getElementById('existingUserPage');
     let homePage = document.getElementById('homePage');
+    let existingEmail = document.getElementById('existingEmail');
+    let existingPassword = document.getElementById('existingPassword');
+    let existingEmailMessage = document.getElementById('existingEmailMessage');
+    let existingPasswordMessage = document.getElementById('existingPasswordMessage');
+    existingEmail.value = "";
+    existingPassword.value = "";
+    existingEmailMessage.innerHTML = "";
+    existingPasswordMessage.innerHTML = "";
     homePage.style.display = "block";
     newUserPage.style.display = "block";
     existingUserPage.style.display = "none";
@@ -69,11 +82,20 @@ function signUp() {
         isEmailExist == false &&
         NewUserPasswordStatus == true &&
         NewUserConfirmPasswordStatus == true &&
-        NewUserPhoneNumberStatus == true) {
-        let newEmail = document.getElementById('newEmail').value;
-        let newUserPassword = document.getElementById('newUserPassword').value;
-        let newUserPhoneNumber = document.getElementById('newUserPhoneNumber').value;
-        UserArrayList.push(new User(newEmail.toLowerCase(), newUserPassword, newUserPhoneNumber, 0));
+        NewUserPhoneNumberStatus == true &&
+        NewNameStatus == true) {
+        let newName = document.getElementById('newName');
+        let newEmail = document.getElementById('newEmail');
+        let newUserPassword = document.getElementById('newUserPassword');
+        let newUserConfirmPassword = document.getElementById('newUserConfirmPassword');
+        let newUserPhoneNumber = document.getElementById('newUserPhoneNumber');
+        UserArrayList.push(new User(newName.value, newEmail.value.toLowerCase(), newUserPassword.value, newUserPhoneNumber.value, 0));
+        newName.value = "";
+        newEmail.value = "";
+        newUserPassword.value = "";
+        newUserConfirmPassword.value = "";
+        newUserPhoneNumber.value = "";
+        alert('User added successfully');
         displayHomePage();
     }
     else {
@@ -81,6 +103,7 @@ function signUp() {
     }
 }
 function emailExist(paramEmail) {
+    isEmailExist = false;
     for (let i = 0; i < UserArrayList.length; i++) {
         if (paramEmail.toLowerCase() == UserArrayList[i].Email.toLowerCase()) {
             isEmailExist = true;
@@ -93,7 +116,7 @@ function checkEmail(paramNewEmail) {
     let newEmail = document.getElementById(paramNewEmail).value;
     let newEmailMessage = document.getElementById(paramNewEmail + "Message");
     let newEmailRegex = /^([a-zA-Z0-9\.-]+)@([a-zA-Z0-9-]+)\.([a-z]{2,20})(\.[a-z]{2,10})?$/;
-    let isEmailExist = emailExist(newEmail);
+    isEmailExist = emailExist(newEmail);
     if (newEmailRegex.test(newEmail) && isEmailExist) {
         NewEmailStatus = true;
         newEmailMessage.style.visibility = "hidden";
@@ -117,7 +140,7 @@ function checkNewEmail(paramNewEmail) {
     let newEmail = document.getElementById(paramNewEmail).value;
     let newEmailMessage = document.getElementById(paramNewEmail + "Message");
     let newEmailRegex = /^([a-zA-Z0-9\.-]+)@([a-zA-Z0-9-]+)\.([a-z]{2,20})(\.[a-z]{2,10})?$/;
-    let isEmailExist = emailExist(newEmail);
+    isEmailExist = emailExist(newEmail);
     if (newEmailRegex.test(newEmail) && !isEmailExist) {
         NewEmailStatus = true;
         newEmailMessage.style.visibility = "hidden";
@@ -135,6 +158,22 @@ function checkNewEmail(paramNewEmail) {
         newEmailMessage.style.visibility = "visible";
         newEmailMessage.style.color = "red";
         newEmailMessage.style.marginLeft = "0.6rem";
+    }
+}
+function checkNewName(paramNewName) {
+    let newName = document.getElementById(paramNewName).value;
+    let newNameMessage = document.getElementById(paramNewName + "Message");
+    let newNameRegex = /^([a-zA-Z@]+)$/;
+    if (newNameRegex.test(newName)) {
+        NewNameStatus = true;
+        newNameMessage.style.visibility = "hidden";
+    }
+    else {
+        NewNameStatus = false;
+        newNameMessage.innerHTML = "Please enter valid Name";
+        newNameMessage.style.visibility = "visible";
+        newNameMessage.style.color = "red";
+        newNameMessage.style.marginLeft = "0.6rem";
     }
 }
 function checkNewUserPassword(paramNewUserPassword) {
@@ -188,31 +227,43 @@ function checkNewUserPhoneNumber(paramNewUserPhoneNumber) {
 function existingUserPage() {
     let newUserPage = document.getElementById('newUserPage');
     let existingUserPage = document.getElementById('existingUserPage');
+    let newName = document.getElementById('newNameMessage');
+    let newEmail = document.getElementById('newEmailMessage');
+    let newUserPassword = document.getElementById('newUserPasswordMessage');
+    let newUserConfirmPassword = document.getElementById('newUserConfirmPasswordMessage');
+    let newUserPhoneNumber = document.getElementById('newUserPhoneNumberMessage');
+    let SignUpForm = document.getElementById('SignUpForm');
+    SignUpForm.reset();
+    newName.innerHTML = "";
+    newEmail.innerHTML = "";
+    newUserPassword.innerHTML = "";
+    newUserConfirmPassword.innerHTML = "";
+    newUserPhoneNumber.innerHTML = "";
     newUserPage.style.display = "none";
     existingUserPage.style.display = "block";
 }
 function signIn() {
-    let noExistingUserIdChecker = true;
-    let email = document.getElementById('existingEmail').value;
-    let userPassword = document.getElementById("existingPassword").value;
+    let email = document.getElementById('existingEmail');
+    checkEmail('existingEmail');
+    let userPassword = document.getElementById("existingPassword");
+    let existingUserId = false;
     if (isEmailExist) {
         for (let i = 0; i < UserArrayList.length; i++) {
-            if (UserArrayList[i].Password == userPassword && UserArrayList[i].Email.toLowerCase() == email.toLowerCase()) {
-                noExistingUserIdChecker = false;
+            if (UserArrayList[i].Password == userPassword.value && UserArrayList[i].Email.toLowerCase() == email.value.toLowerCase()) {
                 CurrentUser = UserArrayList[i];
+                email.value = "";
+                userPassword.value = "";
+                existingUserId = true;
                 medicinePage();
                 return;
             }
-            else {
-                noExistingUserIdChecker = true;
-            }
         }
-        if (noExistingUserIdChecker) {
-            alert("Email ID or password mismatch");
+        if (!existingUserId) {
+            alert('Email ID not registered');
         }
     }
     else {
-        alert("Email doesn't registered ");
+        alert("Email ID is not in database. pleaase register ");
     }
 }
 function medicinePage() {
@@ -223,7 +274,7 @@ function medicinePage() {
     medicinePage.style.display = "block";
     menu.style.display = "block";
     greet.style.display = "block";
-    greet.innerHTML = `<h3>Hello ${CurrentUser.Email}</h3>`;
+    greet.innerHTML = `<h3>Hello ${CurrentUser.UserName}</h3>`;
 }
 const form = document.getElementById("addMedicineForm");
 const medicineName = document.getElementById('medicineName');
@@ -301,11 +352,11 @@ function showOrderHistory() {
     let showOrderHistoryTable = document.getElementById('showOrderHistoryTable');
     showOrderHistoryTable.style.display = "block";
     let tableHTML = "<h2>Orders</h2><table border='1'>";
-    tableHTML += "<tr><td>Order ID</td><td>Medicine ID</td><td>Medicine Name</td><td>Count</td><td>Total Price</td><td>Order Status</td></tr>";
+    tableHTML += "<tr><td>Order ID</td><td>Medicine ID</td><td>Medicine Name</td><td>Count</td><td>Total Price</td><td>Ordered Date</td><td>Order Status</td></tr>";
     let orderCount = 0;
     for (let i = 0; i < OrderList.length; i++) {
         if (OrderList[i].UserId == CurrentUser.UserId) {
-            tableHTML += `<tr><td>${OrderList[i].OrderId}</td><td>${OrderList[i].MedicineId}</td><td>${OrderList[i].MedicineName}</td><td>${OrderList[i].MedicineCount}</td><td>${OrderList[i].TotalPrice}</td><td>${OrderList[i].OrderStatus}</td></tr>`;
+            tableHTML += `<tr><td>${OrderList[i].OrderId}</td><td>${OrderList[i].MedicineId}</td><td>${OrderList[i].MedicineName}</td><td>${OrderList[i].MedicineCount}</td><td>${OrderList[i].TotalPrice}</td><td>${OrderList[i].OrderDate.toLocaleDateString('en-GB')}</td><td>${OrderList[i].OrderStatus}</td></tr>`;
             orderCount++;
         }
     }
@@ -322,17 +373,17 @@ function cancelOrder() {
     let cancelOrderTable = document.getElementById('cancelOrderTable');
     cancelOrderTable.style.display = "block";
     let tableHTML = "<h2>Cancel Order</h2><table border='1'>";
-    tableHTML += "<tr><td>Order ID</td><td>Medicine ID</td><td>Medicine Name</td><td>Count</td><td>Total Price</td><td>Order Status</td></tr>";
+    tableHTML += "<tr><td>Order ID</td><td>Medicine ID</td><td>Medicine Name</td><td>Count</td><td>Total Price</td><td>Order Date</td><td>Order Status</td><td>Action</td></tr>";
     let orderCount = 0;
     for (let i = 0; i < OrderList.length; i++) {
         if (OrderList[i].UserId == CurrentUser.UserId && OrderList[i].OrderStatus == OrderStatus.Ordered) {
-            tableHTML += `<tr><td>${OrderList[i].OrderId}</td><td>${OrderList[i].MedicineId}</td><td>${OrderList[i].MedicineName}</td><td>${OrderList[i].MedicineCount}</td><td>${OrderList[i].TotalPrice}</td><td>${OrderList[i].OrderStatus}</td><td><button onclick="cancel('${OrderList[i].OrderId}')">Cancel</button></td></tr>`;
+            tableHTML += `<tr><td>${OrderList[i].OrderId}</td><td>${OrderList[i].MedicineId}</td><td>${OrderList[i].MedicineName}</td><td>${OrderList[i].MedicineCount}</td><td>${OrderList[i].TotalPrice}</td><td>${OrderList[i].OrderDate.toLocaleDateString('en-GB')}</td><td>${OrderList[i].OrderStatus}</td><td><button onclick="cancel('${OrderList[i].OrderId}')">Cancel</button></td></tr>`;
             orderCount++;
         }
     }
     tableHTML += "</table>";
     if (orderCount == 0) {
-        cancelOrderTable.innerHTML = "<h2>Order History is empty to cancel.</h2>";
+        cancelOrderTable.innerHTML = "<h2>There is no order to cancel.</h2>";
     }
     else {
         cancelOrderTable.innerHTML = tableHTML;
@@ -361,16 +412,21 @@ function purchaseMedicine() {
     purchaseMedicineTable.style.display = "block";
     let tableHTML = "<h3>PurchaseMedicine</h3>";
     tableHTML += "<table border='1'>";
-    tableHTML += "<tr><th>Medicine Name</th><th>Count</th><th>Price</th><th>Expiry date</th><th></th></tr>";
+    tableHTML += "<tr><th>Medicine Name</th><th>Count</th><th>Price</th><th>Action</th></tr>";
     for (let i = 0; i < MedicineList.length; i++) {
         if (MedicineList[i].MedicineExpiryDate > new Date() && MedicineList[i].MedicineCount > 0) {
-            tableHTML += `<tr><td>${MedicineList[i].MedicineName}</td><td>${MedicineList[i].MedicineCount}</td><td>${MedicineList[i].MedicinePrice}</td><td>${MedicineList[i].MedicineExpiryDate.toLocaleDateString('en-GB')}</td>
-            <td><input type="number" value="0" style="width:5rem; margin-right:1rem;" min="1" max="${MedicineList[i].MedicineCount}" id="${MedicineList[i].MedicineId}Quantity">
+            tableHTML += `<tr><td>${MedicineList[i].MedicineName}</td><td>${MedicineList[i].MedicineCount}</td><td>${MedicineList[i].MedicinePrice}</td>
+            <td><button onclick="showPurchase('${MedicineList[i].MedicineId}')">To Buy</button></td>
+            <td id="${MedicineList[i].MedicineId}Purchase" style="display:none;border-style:none;">Enter quantity: <input type="number" value="0" style="width:5rem;  margin-right:1rem;" min="1" max="${MedicineList[i].MedicineCount}" id="${MedicineList[i].MedicineId}Quantity">
             <button onclick="purchase('${MedicineList[i].MedicineId}','${MedicineList[i].MedicineId}Quantity')">Purchase</button></td></tr>`;
         }
     }
     tableHTML += "</table>";
     purchaseMedicineTable.innerHTML = tableHTML;
+}
+function showPurchase(paramMedicineID) {
+    let showMedicineInput = document.getElementById(paramMedicineID + "Purchase");
+    showMedicineInput.style.display = "block";
 }
 function purchase(paramMedicineID, newQuantityElement) {
     let item = MedicineList.find((item) => item.MedicineId == paramMedicineID);
@@ -382,7 +438,7 @@ function purchase(paramMedicineID, newQuantityElement) {
         amount = parseInt(newQuantity.value) * item.MedicinePrice;
     }
     if (parseInt(newQuantity.value) > oldQuantity) {
-        alert('Quantity is not available');
+        alert('Quantity is not available (Out Of Stock)');
     }
     else if (parseInt(newQuantity.value) < 1) {
         alert('Enter valid quantity to purchase');
@@ -394,8 +450,11 @@ function purchase(paramMedicineID, newQuantityElement) {
         CurrentUser.Balance -= amount;
         if (item != null) {
             item.MedicineCount -= parseInt(newQuantity.value);
-            OrderList.push(new Order(item.MedicineId, CurrentUser.UserId, item.MedicineName, parseInt(newQuantity.value), amount, OrderStatus.Ordered));
-            alert('Medicine purchase successfully');
+            OrderList.push(new Order(item.MedicineId, CurrentUser.UserId, item.MedicineName, parseInt(newQuantity.value), amount, OrderStatus.Ordered, new Date()));
+            alert(`${item.MedicineName} Medicine purchased successfully and debited amount ${amount} from your wallet`);
+            newQuantity.innerHTML = "0";
+            let showMedicineInput = document.getElementById(paramMedicineID + "Purchase");
+            showMedicineInput.style.display = "none";
         }
     }
     purchaseMedicine();
@@ -408,7 +467,7 @@ function showMedicineDetails() {
     medicineDetailsPage.style.display = "block";
     let tableHTML = "<h3>Medicine</h3>";
     tableHTML += "<table border='1'>";
-    tableHTML += "<tr><th>Medicine Name</th><th>Count</th><th>Price</th><th>Expiry date</th><th></th></tr>";
+    tableHTML += "<tr><th>Medicine Name</th><th>Count</th><th>Price</th><th>Expiry date</th><th>Action</th></tr>";
     for (let i = 0; i < MedicineList.length; i++) {
         if (MedicineList[i].MedicineExpiryDate > new Date()) {
             tableHTML += `<tr><td>${MedicineList[i].MedicineName}</td><td>${MedicineList[i].MedicineCount}</td><td>${MedicineList[i].MedicinePrice}</td><td>${MedicineList[i].MedicineExpiryDate.toLocaleDateString('en-GB')}</td>
@@ -430,7 +489,7 @@ function showEditMedicineForm() {
 }
 function displayHomePage() {
     hideAllHome();
-    CurrentUser = new User("", "", "", 0);
+    CurrentUser = new User("", "", "", "", 0);
     let menu = document.getElementById('menu');
     menu.style.display = "none";
     let medicinePage = document.getElementById('medicinePage');

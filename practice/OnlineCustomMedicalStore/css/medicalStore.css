@@ -36,7 +36,15 @@ input{
     list-style: none;
     display: flex;
 }
+#editForm table, #medicineForm table {
+    border-style: none;
+    border-collapse: collapse;
+    padding: 1rem;
+}
 th, td{
+    padding: 1rem;
+}
+table{
     border-style: none;
     border-collapse: collapse;
     padding: 1rem;

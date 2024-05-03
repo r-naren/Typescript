@@ -40,3 +40,18 @@ function getArray(items) {
     return new Array().concat(items);
 }
 let array = getArray([1, 2, 3]);
+const date = new Date(2012, 2, 2);
+console.log(date);
+console.log(date.toLocaleDateString('en-US'));
+// → "12/19/2012"
+// British English uses day-month-year order
+console.log(date.toLocaleDateString('en-GB'));
+// → "20/12/2012"
+// Korean uses year-month-day order
+console.log(date.toLocaleDateString('ko-KR'));
+// → "2012. 12. 20."
+// Arabic in most Arabic speaking countries uses real Arabic digits
+console.log(date.toLocaleDateString('ar-EG'));
+// → "٢٠‏/١٢‏/٢٠١٢"
+// chinese
+console.log(date.toLocaleDateString('zh-Hans-CN'));
